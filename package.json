@@ -1,0 +1,51 @@
+{
+  "name": "app",
+  "version": "5.0.0",
+  "private": true,
+  "scripts": {
+    "start": "node ./bin/www",
+    "lesswatch": "less-watch-compiler public/stylesheets/modules public/stylesheets style.less",
+    "test": "nyc --reporter=html --reporter=text mocha test/**/*.js",
+    "test-scrutinizer": "nyc --reporter=html --reporter=clover mocha test/**/*.js",
+    "report-coveralls": "nyc report --reporter=text-lcov | coveralls",
+    "report-codecov": "nyc report --reporter=lcov > coverage.lcov && codecov"
+  },
+  "dependencies": {
+    "body-parser": "^1.18.2",
+    "cookie-parser": "^1.4.3",
+    "debug": "^2.6.9",
+    "express": "^4.15.5",
+    "express-session": "^1.15.6",
+    "jstransformer-markdown-it": "^2.0.0",
+    "memorytest": "^1.0.10",
+    "mongodb": "2.2.33",
+    "morgan": "^1.9.0",
+    "password-hash": "^1.2.2",
+    "pug": "^2.0.0-beta11",
+    "serve-favicon": "^2.4.5",
+    "ws": "^3.3.2"
+  },
+  "main": "app.js",
+  "author": "Magnus Andersson",
+  "license": "ISC",
+  "description": "",
+  "devDependencies": {
+    "clean-css-cli": "^4.1.10",
+    "codecov": "^3.0.0",
+    "coveralls": "^3.0.0",
+    "csslint": "^1.0.5",
+    "eslint": "^4.13.0",
+    "eslint-plugin-react": "^7.5.1",
+    "html-minifier": "^3.5.7",
+    "htmlhint": "^0.9.13",
+    "js-yaml": "^3.10.0",
+    "jscs": "^3.0.7",
+    "jsonlint": "^1.6.2",
+    "lesshint": "^4.5.0",
+    "mocha": "^4.0.1",
+    "nyc": "^11.4.0",
+    "pug-lint": "^2.5.0",
+    "stylelint": "^8.3.1",
+    "uglify-js": "^3.2.1"
+  }
+}

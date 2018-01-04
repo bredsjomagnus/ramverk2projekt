@@ -1,0 +1,26 @@
+extends ../layout
+
+block main
+    .container
+        .page
+            div.col-md-7
+                h4 INLAGDA ANVÄNDARE
+                p.text-muted Klicka i tabellen för att redigera information för en inlagd användare.
+
+                <table class='table'>
+                    <thead>
+                        <th>Användarnamn</th>
+                        <th></th>
+                    </thead>
+                    <tbody>
+                        each val, index in result
+                            <tr>
+                                <td>
+                                    <div id='username_#{result[index]._id}' onclick="toForm('username_#{result[index]._id}', '#{result[index]._id}', '#{result[index].username}', 'username')">#{result[index].username}</div>
+                                </td>
+                                <td>
+                                    <a href='./delete/#{result[index]._id}'>Ta bort</a>
+                                </td>
+                            </tr>
+                    </tbody>
+                </table>

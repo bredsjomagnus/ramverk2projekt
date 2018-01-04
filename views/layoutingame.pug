@@ -1,0 +1,40 @@
+doctype html
+html
+    head
+        title= title
+        link(href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css", rel="stylesheet", integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u", crossorigin="anonymous")
+
+        script(src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js")
+
+        link(rel='stylesheet', href='/stylesheets/style.css')
+    body
+
+
+        block main
+
+        block footer
+            <div class="footer col-md-12">
+                <div class="col-md-offset-2 col-md-8">
+                    <div class="footerpart col-md-4">
+                        <h5>STUDENT</h5>
+                        <p>Magnus Andersson | maaa16</p>
+                        <p>magnusandersson076@gmail.com</p>
+                    </div>
+                    <div class="footerpart col-md-4">
+                        <h5>LÄNKAR</h5>
+                        a(href='http://82.102.5.98:1337/') me/redovisning <br>
+                        <a href="https://github.com/bredsjomagnus/ramverk2">GIT</a><br />
+                        <a href="http://www.student.bth.se/~maaa16/dbwebb-kurser/ramverk2">BTH ramverk2</a><br />
+                        <a href="https://security.sensiolabs.org/check">SensioLabs - Security Advisories Checker</a>
+                    </div>
+                    <div class="footerpart col-md-4">
+                        <h5>BTH</h5>
+                        <p>PA1442 H17 Lp2 Webbaserade ramverk 2</p>
+                    </div>
+                </div>
+            </div>
+
+
+
+        block scripts
+            script(src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js", integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa", crossorigin="anonymous")

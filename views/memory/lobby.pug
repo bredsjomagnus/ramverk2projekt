@@ -1,0 +1,24 @@
+extend ../layout.pug
+
+block main
+    .container
+        .page
+            h1 Memoryspel - Lobby
+
+            h3 Spelrum
+            div.well#gamerooms
+                p #{numbergamerooms}
+                div.col-md-8
+                    <form id='connectform'>
+                        <div class="input-group">
+                            <input class='form-control' style=width:98%; type='text' id='roomname' placeholder='Rumsnamn'>
+                            <input class='form-control' type='hidden' id='nickname' value='#{nickname}'>
+                            <span class="input-group-btn">
+                                <input class='btn btn-primary' type='button' id='newroom' value='Skapa rum' disabled>
+                            </span>
+                        </div>
+                    </form>
+
+block scripts
+    script(src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js", integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa", crossorigin="anonymous")
+    script(src="/javascripts/memorylobby.js")

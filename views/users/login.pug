@@ -1,0 +1,16 @@
+extends ../layout
+
+block main
+    .container
+        .page
+            h1 Logga in
+
+            <form action='#' method='POST'>
+                <input type='text' name='username' placeholder='Användarnamn' />
+                <input type='password' name='password' placeholder='Lösenord' />
+                <input type='submit' name='loginbtn' value='Logga in' />
+                <input type='submit' name='createuserbtn' value='Skapa konto' />
+            </form>
+
+block scripts
+    script(src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js", integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa", crossorigin="anonymous")

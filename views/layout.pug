@@ -1,0 +1,90 @@
+doctype html
+html
+    head
+        title= title
+        link(href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css", rel="stylesheet", integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u", crossorigin="anonymous")
+
+        script(src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js")
+
+        link(rel='stylesheet', href='/stylesheets/style.css')
+    body
+
+
+
+        block navbar
+            <nav class="navbar navbar-inverse">
+                <div class="container-fluid">
+                    <!-- Brand and toggle get grouped for better mobile display -->
+                    <div class="navbar-header">
+                        <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1" aria-expanded="false">
+                            <span class="sr-only">Toggle navigation</span>
+                            <span class="icon-bar"></span>
+                            <span class="icon-bar"></span>
+                            <span class="icon-bar"></span>
+                        </button>
+                        <a class="navbar-brand" href="/">Memoryspel</a>
+                    </div>
+
+                    <!-- Collect the nav links, forms, and other content for toggling -->
+                    <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+                        <ul class="nav navbar-nav">
+                            each value in navlist
+                                if(inloggad)
+                                        if thisurl == value.route
+                                            if value.route == '/users/login'
+
+                                            else
+                                                li(class='active')
+                                                    a(href= value.route)= value.text
+                                        else
+                                            if value.route == '/users/login'
+
+                                            else
+                                                li
+                                                    a(href= value.route)= value.text
+                                else
+                                    if thisurl == value.route
+                                        if value.route == '/users/logout'
+
+                                        else
+                                            li(class='active')
+                                                a(href= value.route)= value.text
+                                    else
+                                        if value.route == '/users/logout'
+
+                                        else
+                                            li
+                                                a(href= value.route)= value.text
+                        </ul>
+                    </div><!-- /.navbar-collapse -->
+                </div><!-- /.container-fluid -->
+            </nav>
+
+        block main
+
+        block footer
+            <div class="footer col-md-12">
+                <div class="col-md-offset-2 col-md-8">
+                    <div class="footerpart col-md-4">
+                        <h5>STUDENT</h5>
+                        <p>Magnus Andersson | maaa16</p>
+                        <p>magnusandersson076@gmail.com</p>
+                    </div>
+                    <div class="footerpart col-md-4">
+                        <h5>LÄNKAR</h5>
+                        a(href='http://82.102.5.98:1337/') me/redovisning <br>
+                        <a href="https://github.com/bredsjomagnus/ramverk2">GIT</a><br />
+                        <a href="http://www.student.bth.se/~maaa16/dbwebb-kurser/ramverk2">BTH ramverk2</a><br />
+                        <a href="https://security.sensiolabs.org/check">SensioLabs - Security Advisories Checker</a>
+                    </div>
+                    <div class="footerpart col-md-4">
+                        <h5>BTH</h5>
+                        <p>PA1442 H17 Lp2 Webbaserade ramverk 2</p>
+                    </div>
+                </div>
+            </div>
+
+
+
+        block scripts
+            script(src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js", integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa", crossorigin="anonymous")

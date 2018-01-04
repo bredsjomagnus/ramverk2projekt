@@ -1,0 +1,361 @@
+#!/usr/bin/env node
+
+/**
+ * Module dependencies.
+ */
+
+var app = require('../app');
+
+var debug = require('debug')('app:server');
+var http = require('http');
+
+const WebSocket = require("ws");
+
+var usersobject = [];
+
+const Gameroom = require('../src/Memory/gameroom');
+let gamerooms = new Gameroom();
+
+const Memory = require('memorytest');
+
+let gameboard;
+let gamebrain = new Memory.Gamebrain();
+let memorycard = new Memory.Memorycard();
+
+/**
+ * Get port from environment and store in Express.
+ */
+
+var port = normalizePort(process.env.PORT || '8002');
+app.set('port', port);
+
+/**
+ * Create HTTP server.
+ */
+
+var server = http.createServer(app);
+
+
+const wss = new WebSocket.Server({
+    server: server,
+    clientTracking: true, // keep track on connected clients
+});
+
+wss.adduser = (nickname, ws) => {
+    usersobject.push({
+        name: nickname,
+        isAlive: true,
+        websocket: ws
+    });
+}
+
+wss.dropuser = (ws) => {
+    var deletenick;
+    var founduser = false;
+
+    usersobject.forEach((userobj) => {
+        if (userobj.websocket === ws) {
+            founduser = true;
+            console.log("Drop " + userobj.name);
+            deletenick = userobj.name;
+            gamebrain.dropPlayer(deletenick);
+        }
+    });
+
+    if (founduser) {
+        usersobject = usersobject.filter(function(usr) {
+           return usr.websocket !== ws;
+        });
+    }
+}
+
+wss.dropdead = () => {
+    var deletenick;
+    var founduser = false;
+
+    usersobject.forEach((userobj) => {
+        if (!userobj.isAlive) {
+            founduser = true;
+            console.log("Drop " + userobj.name);
+            deletenick = userobj.name;
+            gamebrain.dropPlayer(deletenick);
+        }
+    });
+
+    if (founduser) {
+        usersobject = usersobject.filter(function(usr) {
+           return usr.isAlive;
+        });
+        msg = {
+            type: "users",
+            userarray: gamebrain.getPlayersNicks(),
+            userscolors: gamebrain.getPlayersColors()
+        }
+        wss.broadcastUsers(JSON.stringify(msg));
+    }
+}
+
+
+
+// Broadcast data to everyone.
+wss.broadcastUsers = (data) => {
+    let clients = 0;
+    wss.clients.forEach((client) => {
+        clients++;
+        client.send(data);
+    });
+    console.log(`Broadcasted users to ${clients} (${wss.clients.size}) clients.`);
+};
+
+// Broadcast data to everyone.
+wss.broadcastToRoom = (data, wsarray) => {
+    let clients = 0;
+    wsarray.forEach((ws) => {
+        clients++;
+        ws.send(data);
+    });
+    console.log(`Broadcasted users to ${clients} (${wss.clients.size}) clients.`);
+};
+
+wss.answerBackWith = (data, ws) => {
+    ws.send(data);
+};
+
+const interval = setInterval(function ping() {
+    if (usersobject.length != wss.clients.size) {
+        usersobject.forEach(function(usr) {
+            usr.isAlive = false;
+        });
+        wss.clients.forEach(function each(ws) {
+            usersobject.forEach((userobj) => {
+                if (userobj.websocket === ws) {
+                    userobj.isAlive = true;
+                }
+            });
+        });
+        wss.dropdead();
+    }
+}, 5000);
+
+
+// Setup for websocket requests.
+// Docs: https://github.com/websockets/ws/blob/master/doc/ws.md
+wss.on("connection", (ws, data) => {
+
+    console.log("Connection received. Adding client.");
+    ws.on("message", (message) => {
+        jsonmsg = JSON.parse(message);
+        if (jsonmsg.type === 'newroom') {
+            let newroomname = jsonmsg.nickname + "-" + jsonmsg.content;
+            // console.log();
+            // console.log("newroom");
+            // console.log("gamerooms: " + gamerooms);
+
+        } else if (jsonmsg.type === 'newuser') {
+            var uniquename = gamebrain.uniquifyname(jsonmsg.content);
+
+            // här skall varje ws sorteras in i rum. kanske att man i
+            // gamebrain kan ha en Map med "gameroom" => [ws, ws, ws,...]
+            gamerooms.addToGameroom(jsonmsg.gameroom, ws);
+
+            console.log("in gamerooms: " + gamerooms.getGameroom());
+
+            wss.adduser(uniquename, ws);
+            playercolor = gamebrain.setPlayerColor(uniquename);
+            uniquemsg = {
+                type: "uniquename",
+                uniquenick: uniquename,
+                colorclass: playercolor
+            }
+            wss.answerBackWith(JSON.stringify(uniquemsg), ws);
+
+            let wsarray = gamerooms.getWebsockets(jsonmsg.gameroom);
+            msg = {
+                type: "users",
+                userarray: gamebrain.getPlayersNicks(),
+                userscolors: gamebrain.getPlayersColors()
+            }
+            // wss.broadcastUsers(JSON.stringify(msg));
+
+            console.log("antal websockets i rummet: " + wsarray.length);
+
+            wss.broadcastToRoom(JSON.stringify(msg), wsarray);
+        } else if (jsonmsg.type === 'deleteuser') {
+            wss.dropuser(ws);
+        } else if (jsonmsg.type === 'clientmsg') {
+            let wsarray = gamerooms.getWebsockets(jsonmsg.gameroom);
+
+            msg = {
+                type: "clientmsg",
+                nick: jsonmsg.nick,
+                content: jsonmsg.content
+            }
+            wss.broadcastToRoom(JSON.stringify(msg), wsarray);
+        } else if (jsonmsg.type === 'startgame') {
+            var playerinturn;
+            gameboard = new Memory.Gameboard(4, 5);
+            memorycard.placeCards(); // shuffle and place cards on gameboard
+            playerinturn = gamebrain.setActivePlayer(true); // true for first turn
+            gameboard.setActivePlayer(playerinturn);
+            msg = {
+                type: "startgame",
+                gameboard: gameboard,
+                playersturn: playerinturn,
+                userarray: gamebrain.getPlayersNicks(),
+                userscolors: gamebrain.getPlayersColors()
+            }
+            wss.broadcastUsers(JSON.stringify(msg));
+        } else if (jsonmsg.type === "clickingcard") {
+            var position = jsonmsg.x+""+jsonmsg.y;
+            var cardvalue = memorycard.getCardValue(position);
+            var type = 'startgame';
+            var gotpair;
+            var pairpositions = [];
+
+            gameboard.addPosition(position);
+            gameboard.addCardValue(cardvalue);
+
+            // tell gamebrain that move has been done.
+            gamebrain.makeMove();
+            // tell gamebrain to remember flipped card and notice eventual pairs
+            gamebrain.setCardValue(jsonmsg.player, jsonmsg.colorclass, cardvalue);
+
+
+            if (gamebrain.numberofplayermoves == 2) {
+                // här har två olika kort vänts.
+                // spelplanen resettas inte.
+                // playerinturn sätt så att ingen kan vända kort
+                playerinturn = false;
+                gameboard.setActivePlayer(playerinturn);
+                type = 'turnbackstageone';
+
+                // msg tillbaka till användaren som gjort klart sitt drag.
+                // så att denna får fram 'Nästa spelare' knappen
+                nextbtnmsg = {
+                    type: 'nextturnbtn'
+                }
+                wss.answerBackWith(JSON.stringify(nextbtnmsg), ws);
+            } else {
+                // Antingen bara ett kort lyft eller ett par lyft.
+                // gotpair parametern i gameboard sätt till spelare eller nopair
+                gotpair = gamebrain.gotPair();
+                gameboard.setGotPair(gotpair);
+                playerinturn = gamebrain.setActivePlayer();
+                gameboard.setActivePlayer(playerinturn);
+
+                if (gotpair != "") {
+                    pairpositions = memorycard.getPairPositions(cardvalue);
+                    gameboard.addPairPositions(pairpositions);
+                    gameboard.addPairValues(cardvalue);
+                    gameboard.addPairColors(jsonmsg.colorclass);
+                }
+            }
+
+            msg = {
+                type: type,
+                gameboard: gameboard,
+                playersturn: playerinturn,
+                userarray: gamebrain.getPlayersNicks(),
+                userscolors: gamebrain.getPlayersColors(),
+            }
+            wss.broadcastUsers(JSON.stringify(msg));
+        } else if (jsonmsg.type === 'flip') {
+            // Här har spelaren tryck på 'Nästa spelare'
+            gameboard.resetCards();
+            gameboard.setGotPair(gamebrain.gotPair());
+            playerinturn = gamebrain.setActivePlayer();
+            gameboard.setActivePlayer(playerinturn);
+            msg = {
+                type: 'startgame',
+                gameboard: gameboard,
+                playersturn: playerinturn,
+                userarray: gamebrain.getPlayersNicks(),
+                userscolors: gamebrain.getPlayersColors(),
+            }
+            wss.broadcastUsers(JSON.stringify(msg));
+        }
+    });
+
+    ws.on("error", (error) => {
+        console.log(`Server error: ${error}`);
+    });
+
+    ws.on("close", (code, reason) => {
+        console.log(`Closing connection: ${code} ${reason}`);
+        msg = {
+            type: "users",
+            userarray: gamebrain.getPlayersNicks(),
+            userscolors: gamebrain.getPlayersColors()
+        }
+        wss.broadcastUsers(JSON.stringify(msg));
+    });
+});
+
+/**
+ * Listen on provided port, on all network interfaces.
+ */
+
+server.listen(port);
+server.on('error', onError);
+server.on('listening', onListening);
+
+/**
+ * Normalize a port into a number, string, or false.
+ */
+
+function normalizePort(val) {
+  var port = parseInt(val, 10);
+
+  if (isNaN(port)) {
+    // named pipe
+    return val;
+  }
+
+  if (port >= 0) {
+    // port number
+    return port;
+  }
+
+  return false;
+}
+
+/**
+ * Event listener for HTTP server "error" event.
+ */
+
+function onError(error) {
+  if (error.syscall !== 'listen') {
+    throw error;
+  }
+
+  var bind = typeof port === 'string'
+    ? 'Pipe ' + port
+    : 'Port ' + port;
+
+  // handle specific listen errors with friendly messages
+  switch (error.code) {
+    case 'EACCES':
+      console.error(bind + ' requires elevated privileges');
+      process.exit(1);
+      break;
+    case 'EADDRINUSE':
+      console.error(bind + ' is already in use');
+      process.exit(1);
+      break;
+    default:
+      throw error;
+  }
+}
+
+/**
+ * Event listener for HTTP server "listening" event.
+ */
+
+function onListening() {
+  var addr = server.address();
+  var bind = typeof addr === 'string'
+    ? 'pipe ' + addr
+    : 'port ' + addr.port;
+  debug('Listening on ' + bind);
+  console.log('Listening on ' + bind);
+}

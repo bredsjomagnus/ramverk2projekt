@@ -1,0 +1,12 @@
+#
+# Image for running test suite.
+#
+FROM node:alpine
+MAINTAINER Magnus Andersson (magnusandersson076@gmail.com)
+
+RUN mkdir -p /app
+WORKDIR /app
+
+COPY package.json /app
+RUN npm update
+RUN npm install

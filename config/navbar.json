@@ -1,0 +1,18 @@
+[
+    {
+        "route": "/",
+        "text": "Hem"
+    },
+    {
+        "route": "/memory/startmemory",
+        "text": "Memory"
+    },
+    {
+        "route": "/users/login",
+        "text": "Logga in"
+    },
+    {
+        "route": "/users/logout",
+        "text": "Logga ut"
+    }
+]
