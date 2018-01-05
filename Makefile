@@ -130,7 +130,7 @@ check: check-tools-js #check-tools-bash check-tools-php
 
 # target: test               - Run all tests.
 .PHONY: test
-test: htmlhint jscs eslint-fix lesshint jsunittest #csslint stylelint
+test: htmlhint jscs lesshint jsunittest #csslint stylelint eslint-fix
 	@$(call HELPTEXT,$@)
 	[ ! -f composer.json ] || composer validate
 
