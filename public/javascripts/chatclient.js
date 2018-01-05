@@ -25,18 +25,19 @@
     * Returns parameter value of parameter with parameterName
     *
     */
-    function findGetParameter(parameterName) {
-        var result = null,
-            tmp = [];
-        location.search
-            .substr(1)
-            .split("&")
-            .forEach(function (item) {
-              tmp = item.split("=");
-              if (tmp[0] === parameterName) result = decodeURIComponent(tmp[1]);
-            });
-        return result;
-    }
+    // function findGetParameter(parameterName) {
+    //     var result = null,
+    //         tmp = [];
+    //
+    //     location.search
+    //         .substr(1)
+    //         .split("&")
+    //         .forEach(function (item) {
+    //             tmp = item.split("=");
+    //             if (tmp[0] === parameterName) {result = decodeURIComponent(tmp[1]);}
+    //         });
+    //     return result;
+    // }
 
     /**
     * Check nickname inputfield. If empty disable connectionbtn.
@@ -164,6 +165,7 @@
         websocket.onopen = function() {
             console.log("The websocket is now open.");
             var msg;
+
             console.log();
             console.log("nickname.value: " +  nickname.value);
             msg = {
@@ -280,11 +282,11 @@
         if (!websocket || websocket.readyState === 3) {
             console.log("The websocket is not connected to a server.");
         } else {
+            // tog bort gameroom: gameroom från msg
             msg = {
                 type: "clientmsg",
                 nick: player.nickname,
-                content: messagetext,
-                gameroom: gameroom
+                content: messagetext
             };
             websocket.send(JSON.stringify(msg));
             console.log("Sending message: " + messagetext);

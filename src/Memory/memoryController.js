@@ -2,7 +2,7 @@ var navbarjson = require('../../config/navbar.json');
 
 // Memory landningssida
 exports.startmemoryPage = function(req, res) {
-    var data, view, gamerooms;
+    var data, view;
 
     //---------------------------
 
@@ -22,7 +22,7 @@ exports.startmemoryPage = function(req, res) {
 
         res.render(view, data);
     } else {
-        res.redirect("/users/login")
+        res.redirect("/users/login");
     }
 };
 
@@ -48,10 +48,6 @@ exports.lobbyPage = function(req, res) {
         };
         res.render(view, data);
     } else {
-        res.redirect("/users/login")
+        res.redirect("/users/login");
     }
-
-    //---------------------------
-
-
 };

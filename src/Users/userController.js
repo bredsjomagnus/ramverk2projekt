@@ -32,9 +32,11 @@ exports.loginPage = async (req, res) => {
             // find in databas user with req.body.username
             // match that user with req.body.password
             let hashedPassword = null;
+
             try {
                 let result = await database.findInCollection(dsn, "players", {"username": req.body.username}, {}, 0);
                 // console.log("result[0].password: " + result[0].password);
+
                 if (result.length > 0) {
                     hashedPassword = result[0].password;
                 }
@@ -48,7 +50,7 @@ exports.loginPage = async (req, res) => {
                 console.log("req.body.password: " + req.body.password);
 
                 if (hashedPassword != null) {
-                    if(passwordHash.verify(req.body.password, hashedPassword)) {
+                    if (passwordHash.verify(req.body.password, hashedPassword)) {
                         // Lyckad inloggning.
                         // Lägger till användare till session
                         // console.log("VÄLKOMMEN " + result[0].username);
@@ -62,19 +64,14 @@ exports.loginPage = async (req, res) => {
                 } else {
                     res.redirect("/users/login");
                 }
-
                 // res.json(res);
             } catch (err) {
                 console.log(err);
                 // res.json(err);
             }
-
         }
     } else {
         // req.session.players = "gurka";
-
-
-
         data = {
             title: 'Login | maaa16',
             navlist: navbarjson,
@@ -86,19 +83,9 @@ exports.loginPage = async (req, res) => {
 
         res.render(view, data);
     }
-
-
-
 };
 
 exports.loginProcess = async (req, res) => {
-    var data, view;
-
-    //---------------------------//
-
-
-    //---------------------------//
-
     if (req.body.loginbtn) {
         // find in databas user with req.body.username
         // match that user with req.body.password
@@ -110,7 +97,7 @@ exports.loginProcess = async (req, res) => {
             console.log();
             console.log("loginProcess");
 
-            if(passwordHash.verify(req.body.password, hashedPassword)) {
+            if (passwordHash.verify(req.body.password, hashedPassword)) {
                 console.log("VÄLKOMMEN " + result.username);
             } else {
                 console.log("Felaktigt inlogg");
@@ -128,7 +115,7 @@ exports.loginProcess = async (req, res) => {
 
 // New user
 exports.newUserPage = async function(req, res) {
-    var data, view, username, password;
+    var data, view;
 
     //---------------------------//
 
@@ -148,8 +135,8 @@ exports.newUserPage = async function(req, res) {
 
     res.render(view, data);
 };
-exports.newUserProcessPage = async function(req, res) {
-    var doc, username, password;
+exports.newUserProcessPage = async function(req) {
+    var doc;
 
     console.log();
     console.log("userController -> newUserProcessPage - kommer hit");
@@ -181,7 +168,7 @@ exports.newUserProcessPage = async function(req, res) {
 };
 
 exports.viewPlayersPage = async (req, res) => {
-    var view, data, doc, username, password;
+    var view, data;
 
     view  = "users/players";
 

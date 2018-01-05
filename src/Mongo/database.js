@@ -36,7 +36,9 @@ exports.insertToCollection = async function(dsn, colName, doc) {
     console.log("doc.firstname: " + doc.firstname);
     console.log("colName " + colName);
     const db = await mongo.connect(dsn);
+
     console.log("db: " + db);
+
     const col = await db.collection(colName);
 
     await col.insert(doc);

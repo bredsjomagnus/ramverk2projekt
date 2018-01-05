@@ -1,5 +1,5 @@
 var express = require('express');
-var session = require('express-session')
+var session = require('express-session');
 var path = require('path');
 var favicon = require('serve-favicon');
 var logger = require('morgan');
@@ -29,7 +29,7 @@ app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
 // Use the session middleware
-app.use(session({ secret: 'jonglera', resave: false, saveUninitialized: false, cookie: { maxAge: 60000 }}))
+app.use(session({ secret: 'jonglera', resave: false, saveUninitialized: false, cookie: { maxAge: 60000 }}));
 // För att spara i session
 // ex req.session.players = "player"
 // ex req.session.passwords = ["pass1", "pass2"]

@@ -57,12 +57,10 @@ router.get('/login', function(req, res) {
 });
 
 /* login process */
-router.post('/loginprocess', function(req, res) {
-
+router.post('/loginprocess', function(req) {
     req.session.players = "gurka";
 
     console.log("req.session.players: " + req.session.players[0]);
-
 });
 
 module.exports = router;
