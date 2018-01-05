@@ -13,8 +13,8 @@ const WebSocket = require("ws");
 
 var usersobject = [];
 
-const Gameroom = require('../src/Memory/gameroom');
-let gamerooms = new Gameroom();
+// const Gameroom = require('../src/Memory/gameroom');
+// let gamerooms = new Gameroom();
 
 const Memory = require('memorytest');
 
@@ -156,9 +156,9 @@ wss.on("connection", (ws, data) => {
 
             // här skall varje ws sorteras in i rum. kanske att man i
             // gamebrain kan ha en Map med "gameroom" => [ws, ws, ws,...]
-            gamerooms.addToGameroom(jsonmsg.gameroom, ws);
+            // gamerooms.addToGameroom(jsonmsg.gameroom, ws);
 
-            console.log("in gamerooms: " + gamerooms.getGameroom());
+            // console.log("in gamerooms: " + gamerooms.getGameroom());
 
             wss.adduser(uniquename, ws);
             playercolor = gamebrain.setPlayerColor(uniquename);
@@ -169,7 +169,7 @@ wss.on("connection", (ws, data) => {
             }
             wss.answerBackWith(JSON.stringify(uniquemsg), ws);
 
-            let wsarray = gamerooms.getWebsockets(jsonmsg.gameroom);
+            // let wsarray = gamerooms.getWebsockets(jsonmsg.gameroom);
             msg = {
                 type: "users",
                 userarray: gamebrain.getPlayersNicks(),
@@ -177,20 +177,20 @@ wss.on("connection", (ws, data) => {
             }
             // wss.broadcastUsers(JSON.stringify(msg));
 
-            console.log("antal websockets i rummet: " + wsarray.length);
+            // console.log("antal websockets i rummet: " + wsarray.length);
 
-            wss.broadcastToRoom(JSON.stringify(msg), wsarray);
+            wss.broadcastUsers(JSON.stringify(msg));
         } else if (jsonmsg.type === 'deleteuser') {
             wss.dropuser(ws);
         } else if (jsonmsg.type === 'clientmsg') {
-            let wsarray = gamerooms.getWebsockets(jsonmsg.gameroom);
+            // let wsarray = gamerooms.getWebsockets(jsonmsg.gameroom);
 
             msg = {
                 type: "clientmsg",
                 nick: jsonmsg.nick,
                 content: jsonmsg.content
             }
-            wss.broadcastToRoom(JSON.stringify(msg), wsarray);
+            wss.broadcastUsers(JSON.stringify(msg));
         } else if (jsonmsg.type === 'startgame') {
             var playerinturn;
             gameboard = new Memory.Gameboard(4, 5);
