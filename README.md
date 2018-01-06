@@ -37,7 +37,7 @@ Med `npm run start-docker` körs `docker-compose up -d express` som bygger på i
 På samma sätt kan man avsluta med `npm run stop docker` som då kör `docker-compose down` och stänger ner alla docker containers.
 
 #### Miljövariabler
-DBWEBB_PORT används för att ange vilken port som kopplas upp mot. Är variablen inte satt används port 1337 som default.
+DBWEBB_PORT används för att ange vilken port som kopplas upp mot. Är variablen inte satt används port 8002 som default.
 
 DBWEBB_DSN sätts till mongo som körs i docker kontainer. Annars används dsn mot [mlab](https://mlab.com/) som default.
 

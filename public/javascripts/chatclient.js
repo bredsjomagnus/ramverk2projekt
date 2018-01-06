@@ -178,6 +178,7 @@
             $("#startgame").show();
             document.getElementById('gameboard').innerHTML = '';
             $("#gameboard").show();
+            $("#navbar").hide();
         };
 
         websocket.onmessage = function(event) {
@@ -213,6 +214,7 @@
             $("#startgame").hide();
             $("#gameboard").hide();
             $("#connectform").show();
+            $("#navbar").show();
         };
     }, false);
 
