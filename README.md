@@ -26,12 +26,20 @@ Applikationen är ett memoryspel som kan köras över nätet med totalt 9 spelar
 
 Vad som inte finns med är möjligheten att starta upp flera olika spel parallellt via en spellobby. Man kan heller inte välja olika typer av memorykort/teman, eller vilken färg man skall ha som spelare.
 
+#### Tekniker
+*Express* har använts för servern och *pug* för vyn. Det var vad som kom från start (express generatorn) och jag har inte sett någon anledning att byta. Det fungerar smidigt och bra och är utan vidare tekniker som klarar bygga denna applikation. Det har inte varit motivation nog att lägga tid på ny teknik när så inte behövts. Framför allt när tiden är en faktor. Man bör självfallet vara medveten om sin alternativ. Speciellt då den dagen kommer när applikationen springer ifrån tekniken och ett byte måste till. Men så har, som sagt, inte varit fallet för detta projekt.
+
 ## Uppstart
 Man kan starta upp sidan med `npm start` och om man sitter i windowsmiljö är det bättre att använda `./restart.bat` för att forcera avslutande av pågående processer, för att det inte skall krocka.
 
 Med `npm run start-docker` körs `docker-compose up -d express` som bygger på imagen `node-alpine`.
 
 På samma sätt kan man avsluta med `npm run stop docker` som då kör `docker-compose down` och stänger ner alla docker containers.
+
+#### Miljövariabler
+DBWEBB_PORT används för att ange vilken port som kopplas upp mot. Är variablen inte satt används port 1337 som default.
+
+DBWEBB_DSN sätts till mongo som körs i docker kontainer. Annars används dsn mot [mlab](https://mlab.com/) som default.
 
 ## Tester
 För tester används *Mocha* tillsammans med *Istanbul*.
@@ -68,19 +76,29 @@ Det som är lite begränande med nuvarande val är att *Travis* inte klarar av n
 
 Med CI och dess badges får man själv och andra snabbt en överblick över hur koden och applikationen mår. Det blir lite av ett kvitto.
 
+Med byggstatus som är grön, kodtäckning på ca 80%, kodkvalité på 9,64 eller mellan A-C bör jag vara rätt så nöjd. Visst kan det bli bättre. Men det är viktigt att väga för och emot i jakten på 100% kodtäckning. Det är inte alltid värt det.
 
 
-## Tekniker
-Följande tekniker har använts för redovisningssidan.
+## Realtid
+Det som går under *realtid* i applikationen är dels chatfunktionen, men framför allt spelfunktionen med flera spelare där varje spelare tilldelas en färg och får en av slumpen tilldelad startspelare.
 
-* Server - Express
-* Vy - Pug
-* Tester - Mocha
-* Databas - MongoDB
+Man kan skicka meddelnaden till varandra före och under ett pågående spel. Under själva spelet skickas information fram och tillbaka vilka drag som görs och hur spelbrädet ändras som en konsekvens av det. På så vis kan upp till 9 spelare köra ett parti Memory över nätet.
 
+#### Teknik
+Det som används är *Websocket* och för att kunna skilja de olika meddelandena åt används JSON för att få med en header (type) och body (content). Det är väldigt grundläggande tekniker men fungerar förvånansvärt väl för uppgiften.
 
+Funderade först på att använda *SocketIO* men då det inte fanns behov för ny teknik till denna applikation var det helt omotiverat att lägga tiden på det. Men jag kan tänka mig att man skulle få mer nytta av att gå över till *SocketIO* om man vill lägga till spellobby och får flera spel parallellt. *SocketIO* verkar ha bra funktioner för bland annat detta. Så för vidare utbyggnad står man nog även inför ett teknikbyte.
 
-### Miljövariabler
-DBWEBB_PORT används för att ange vilken port som kopplas upp mot. Är variablen inte satt används port 1337 som default.
+## Databas
+För att kunna spela ett parti Memory måste man logga in. Det är här databasen kommer in. Man kan skapa ett konto med unikt användarnamn och allting sparas som ett dokument i en MongoDB.
 
-DBWEBB_DSN sätts till mongo som körs i docker kontainer. Annars används dsn mot [mlab](https://mlab.com/) som default.
+För ändamålet fungerar MongoDB utmärkt. Sen skulle det egentligen ha fungerat precis lika bra med en SQL-databas. Men det är trevligt att använda annat ibland, bara för sakens skull.
+
+Tror mig kunna se like olika användningsområden för när man skall använda non-SQL och SQL. Med tanke på den säkerhet, stabilitet och en kodstandard som kommer med SQL är den klart intressantast i större projekt och projekt som kräver hög säkerhet/stabilitet. Likaså då man inte har behov av annat än databas i tabellformat. Då finns ingen anledning att välja något annat. Jag har kommit att gilla non-SQL och möjligheten att spara hela JSON-filer, med allt vad det innebär.
+
+## NPM-modul
+Som en del av applikationen används min egen npm-modul [memorytest](https://www.npmjs.com/package/memorytest).
+
+*Memorytest* är memoryspelets hjärta och innehåller spelkorten (memorycards), spelbrädet (gameboard) och spelets hjärna (gamebrain). Det är gamebrain som har koll på reglerna och dirigerar spelet framåt efter varje nytt drag - exemplevis vilka som spelar, vems tur det är och vad som kommer hända härnäst. Gameboard uppdateras efter varje nytt drag och skickas ut till spelarna. Memorycards har ordning på korten och kan blanda annat placera korten på brädet, se ifall två kort är ett par, svara på vilket värde ett viss kort har.
+
+Npm är en väldigt smidig packethanterare och framför allt snabb i jämförelse mot phps packagist. Dessutom gör npms popularitet att man lätt kan få spritt sina moduler där samt att man med stor säkerhet kan finna vad man söker där.
