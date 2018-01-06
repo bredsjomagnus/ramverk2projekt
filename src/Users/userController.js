@@ -154,6 +154,7 @@ exports.newUserProcessPage = async function(req, res) {
     if (req.body.createuserbtn) {
         try {
             let usernamecontrol = await database.findInCollection(dsn, "players", {"username": req.body.username}, {}, 0);
+
             if (usernamecontrol.length === 0) {
                 doc =  {
                     "username": req.body.username,
@@ -164,7 +165,6 @@ exports.newUserProcessPage = async function(req, res) {
             } else {
                 res.redirect("/users/newuser?errormsg=Användarnamnet upptaget");
             }
-
         } catch (err) {
             console.log(err);
             res.redirect("/users/newuser");
