@@ -115,7 +115,7 @@ exports.loginProcess = async (req, res) => {
 
 // New user
 exports.newUserPage = async function(req, res) {
-    var data, view;
+    var data, view, errormsg;
 
     //---------------------------//
 
@@ -123,19 +123,21 @@ exports.newUserPage = async function(req, res) {
 
     //---------------------------//
 
+    errormsg = (req.query.errormsg) ? req.query.errormsg : "";
 
     data = {
         title: 'Nytt konto | maaa16',
         navlist: navbarjson,
         inloggad: req.session.player,
         thisurl: "/users/newuser",
+        errormsg: errormsg
     };
 
     //---------------------------//
 
     res.render(view, data);
 };
-exports.newUserProcessPage = async function(req) {
+exports.newUserProcessPage = async function(req, res) {
     var doc;
 
     console.log();
@@ -151,18 +153,21 @@ exports.newUserProcessPage = async function(req) {
     -------------------------------*/
     if (req.body.createuserbtn) {
         try {
-            // doc =  {
-            //     "username": req.body.username,
-            //     "password": req.body.password
-            // };
-            doc =  {
-                "username": req.body.username,
-                "password": passwordHash.generate(req.body.password),
-            };
-            await database.insertToCollection(dsn, "players", doc);
-            // res.redirect("/");
+            let usernamecontrol = await database.findInCollection(dsn, "players", {"username": req.body.username}, {}, 0);
+            if (usernamecontrol.length === 0) {
+                doc =  {
+                    "username": req.body.username,
+                    "password": passwordHash.generate(req.body.password),
+                };
+                await database.insertToCollection(dsn, "players", doc);
+                res.redirect("/users/login");
+            } else {
+                res.redirect("/users/newuser?errormsg=Användarnamnet upptaget");
+            }
+
         } catch (err) {
             console.log(err);
+            res.redirect("/users/newuser");
         }
     }
 };
