@@ -15,7 +15,9 @@
 
 # Projekt - ramverk2
 För utbildning, PA1442 H17 Lp2 Webbaserade ramverk 2 (distans) BTH.
-Ett demo för repot finns [här](http://82.102.5.98:8002/). Demot kör via docker.
+Ett demo för repot finns [här](http://82.102.5.98:8002/).
+
+![demobild](/public/images/gitimage.png)
 
 ## Kravbild
 Applikationen är ett memoryspel som kan köras över nätet med totalt 9 spelare. Det krävs att man har ett konto och att man loggat in för att kunna koppla upp sig mot spelet. Det finns även en chat som kan användas före och under ett uppstartats spel.
